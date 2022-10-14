@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     camera::Camera MVS_cap(hikrobot_camera);
     //********** rosnode init **********/
     image_transport::ImageTransport main_cam_image(hikrobot_camera);
-    image_transport::CameraPublisher image_pub = main_cam_image.advertiseCamera("/hikrobot_camera/rgb", 1000);
+    image_transport::CameraPublisher image_pub = main_cam_image.advertiseCamera("/camera/image_raw", 1000);
 
     sensor_msgs::Image image_msg;
     sensor_msgs::CameraInfo camera_info_msg;
