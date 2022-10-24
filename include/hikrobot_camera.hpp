@@ -14,6 +14,7 @@ namespace camera
 #define MAX_IMAGE_DATA_SIZE (4 * 2048 * 3072)
     //********** frame ************************************/
     cv::Mat frame;
+    MV_FRAME_OUT_INFO_EX frameInfo;
     //********** frame_empty ******************************/
     bool frame_empty = 0;
     //********** mutex ************************************/
@@ -62,6 +63,10 @@ namespace camera
         //********** 读图10个相机的原始图像 ********************************/
         void ReadImg(cv::Mat &image);
 
+        void LoadSettings(const char *path);
+
+        MV_FRAME_OUT_INFO_EX getFrameInfo();
+
     private:
         //********** handle ******************************/
         void *handle;
@@ -92,7 +97,7 @@ namespace camera
     Camera::Camera(ros::NodeHandle &node)
     {
         handle = NULL;
-
+        frameInfo = {0};
         //********** 读取待设置的摄像头参数 第三个参数是默认值 yaml文件未给出该值时生效 ********************************/
         node.param("width", width, 3072);
         node.param("height", height, 2048);
@@ -160,6 +165,8 @@ namespace camera
             printf("MV_CC_OpenDevice fail! nRet [%x]\n", nRet);
             exit(-1);
         }
+        const char *path = "/home/user/get_data_ws/src/hikrobot_camera/src/FeatureFile.ini";
+        LoadSettings(path);
 
         //设置 yaml 文件里面的配置
         this->set(CAP_PROP_FRAMERATE_ENABLE, FrameRateEnable);
@@ -281,6 +288,7 @@ namespace camera
             printf("thread create failed.ret = %d\n", nRet);
             exit(-1);
         }
+
     }
 
     //^ ********************************** Camera constructor************************************ //
@@ -615,6 +623,8 @@ namespace camera
         return nRet;
     }
 
+
+
     //^ ********************************** PrintDeviceInfo ************************************ //
     bool Camera::PrintDeviceInfo(MV_CC_DEVICE_INFO *pstMVDevInfo)
     {
@@ -640,6 +650,24 @@ namespace camera
     }
 
     //^ ********************************** Camera constructor************************************ //
+    void Camera::LoadSettings(const char *path)
+    {
+        printf("Start import the camera properties from the file\n");
+        printf("Wait......\n");
+        nRet = MV_CC_FeatureLoad(handle, "/home/user/get_data_ws/src/hikrobot_camera/src/FeatureFile.ini");
+        //nRet = MV_CC_FeatureSave(handle, "FeatureFile.ini");
+        if (MV_OK != nRet)
+        {
+            printf("Load Feature fail! nRet [0x%x]\n", nRet);
+        }
+        else
+        {
+            printf("Finish import the camera properties from the file\n");
+        }
+    }
+        
+
+    //^ ********************************** Camera constructor************************************ //
     void Camera::ReadImg(cv::Mat &image)
     {
 
@@ -654,6 +682,12 @@ namespace camera
             frame_empty = 1;
         }
         pthread_mutex_unlock(&mutex);
+    }
+
+    MV_FRAME_OUT_INFO_EX Camera::getFrameInfo()
+    {
+
+        return camera::frameInfo;
     }
 
     //^ ********************************** HKWorkThread1 ************************************ //
@@ -682,7 +716,6 @@ namespace camera
             }
             image_empty_count = 0; //空图帧数
             //转换图像格式为BGR8
-
             stConvertParam.nWidth = 3072;                               //ch:图像宽 | en:image width
             stConvertParam.nHeight = 2048;                              //ch:图像高 | en:image height
             stConvertParam.pSrcData = m_pBufForDriver;                  //ch:输入数据缓存 | en:input data buffer
@@ -693,6 +726,7 @@ namespace camera
             stConvertParam.enSrcPixelType = stImageInfo.enPixelType;    //ch:输入像素格式 | en:input pixel format                       //! 输入格式 RGB
             MV_CC_ConvertPixelType(p_handle, &stConvertParam);
             pthread_mutex_lock(&mutex);
+            camera::frameInfo = stImageInfo;
             camera::frame = cv::Mat(stImageInfo.nHeight, stImageInfo.nWidth, CV_8UC3, m_pBufForSaveImage).clone(); //tmp.clone();
             frame_empty = 0;
             pthread_mutex_unlock(&mutex);
