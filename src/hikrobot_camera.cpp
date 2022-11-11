@@ -3,6 +3,7 @@
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include <ros/ros.h>
+#include <rosgraph_msgs/Clock.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
@@ -33,6 +34,11 @@ int main(int argc, char **argv)
     //********** rosnode init **********/
     image_transport::ImageTransport main_cam_image(hikrobot_camera);
     image_transport::CameraPublisher image_pub = main_cam_image.advertiseCamera("/hikrobot_camera/image_raw", 1000);
+
+
+    //clock publisher
+    ros::Publisher clock_pub =  hikrobot_camera.advertise<rosgraph_msgs::Clock>("clock", 1000);
+    rosgraph_msgs::Clock clock_message;
 
     sensor_msgs::Image image_msg;
     sensor_msgs::CameraInfo camera_info_msg;
@@ -78,7 +84,7 @@ int main(int argc, char **argv)
         uint64_t time = (uint64_t) frameInfo.nDevTimeStampHigh << 32 | frameInfo.nDevTimeStampLow;
         uint64_t sec = time/1000000000;
         uint64_t nsec = time%1000000000;
-        image_msg.header.stamp = ros::Time(sec , nsec);  // ros发出的时间不是快门时间
+        image_msg.header.stamp = ros::Time::now();  // ros发出的时间不是快门时间
         image_msg.header.frame_id = "hikrobot_camera";
 
         camera_info_msg.header.frame_id = image_msg.header.frame_id;

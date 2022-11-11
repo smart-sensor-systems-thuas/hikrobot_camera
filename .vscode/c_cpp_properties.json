@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/user/catkin_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/user/catkin_ws/src/image_pipeline/depth_image_proc/include/**",
+        "/home/user/catkin_ws/src/hikrobot_camera/include/**",
+        "/home/user/catkin_ws/src/image_pipeline/image_proc/include/**",
+        "/home/user/catkin_ws/src/image_pipeline/stereo_image_proc/include/**",
+        "/home/user/catkin_ws/src/velo2cam_calibration/include/**",
+        "/home/user/catkin_ws/src/velodyne/velodyne_driver/include/**",
+        "/home/user/catkin_ws/src/velodyne/velodyne_laserscan/include/**",
+        "/home/user/catkin_ws/src/velodyne/velodyne_pcl/include/**",
+        "/home/user/catkin_ws/src/velodyne/velodyne_pointcloud/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
