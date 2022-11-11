@@ -4,7 +4,7 @@ Please install mvs, https://blog.csdn.net/weixin_41965898/article/details/116801
 
 # Install
 ```
-mkdir -p ~/ws_hikrobot_camera/src
+mkdir -p ~/catkin_ws/src
 git clone https://github.com/smart-sensor-systems-thuas/hikrobot_camera.git ~/catkin_ws/src/hikrobot_camera
 cd ~/catkin_ws
 catkin_make
